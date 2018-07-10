@@ -724,6 +724,9 @@ class MesosClient(object):
         :type operations: list of json TaskInfo
         :param options: optional filters
         :type options: JSON filters instances
+
+        This method does not check if the operations are valid
+        JSON TaskInfo instances and if conform with the offers.
         '''
         if not operations:
             self.logger.debug('Mesos:Accept:no operation to accept')
@@ -743,14 +746,6 @@ class MesosClient(object):
             'Mesos-Stream-Id': self.streamId
         }
 
-        tasks = []
-        for operation in operations:
-            if 'agent_id' not in operation:
-                operation['agent_id'] = {
-                    'value': ids[0]
-                }
-            tasks.append(operation)
-
         message = {
             "framework_id": {"value": self.frameworkId},
             "type": "ACCEPT",
@@ -758,7 +753,7 @@ class MesosClient(object):
                 "offer_ids": offer_ids,
                 "operations": [{
                     'type': 'LAUNCH',
-                    'launch': {'task_infos': tasks}
+                    'launch': {'task_infos': operations}
                 }]
             }
         }
