@@ -122,6 +122,30 @@ class MesosClient(object):
             except Exception as e:
                 raise MesosException(e)
 
+        def suppress(self):
+            '''
+            Send SUPPRESS request
+            '''
+            headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Mesos-Stream-Id': self.streamId
+            }
+
+            suppress = {
+                "framework_id": {"value": self.frameworkId},
+                "type": "SUPPRESS",
+            }
+
+            try:
+                requests.post(
+                    self.mesos_url + '/api/v1/scheduler',
+                    json.dumps(suppress),
+                    headers=headers
+                )
+            except Exception as e:
+                raise MesosException(e)
+
         def kill(self, agent_id, task_id):
             '''
             Kill specified task
