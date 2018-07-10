@@ -747,7 +747,7 @@ class MesosClient(object):
         for operation in operations:
             if 'agent_id' not in operation:
                 operation['agent_id'] = {
-                    'value': self.offer[0]['agent_id']['value']
+                    'value': ids[0]
                 }
             tasks.append(operation)
 
