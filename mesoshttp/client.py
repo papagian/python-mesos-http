@@ -801,3 +801,42 @@ class MesosClient(object):
         except Exception as e:
             raise MesosException(e)
         return True
+
+
+    def multi_decline_offers(self, offers, options=None):
+        '''
+        Decline offer
+
+        :param options: Optional offer additional params (filters, ...)
+        :type options: dict
+        '''
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Mesos-Stream-Id': self.streamId
+        }
+        offers_decline = {
+            "framework_id": {"value": self.frameworkId},
+            "type": "DECLINE",
+            "decline": {
+                "offer_ids": []
+            }
+        }
+        if options and options.get('filters'):
+            offers_decline["decline"]["filters"] = options.get('filters')
+
+        ids = [o.get_offer()['id']['value'] for o in offers]
+        self.logger.debug('Mesos:MULTIPLE_DECLINE Offer ids:' + ','.join(ids))
+        for oid in ids:
+            offers_decline['decline']['offer_ids'].append(
+                  {'value': oid}
+            )
+        try:
+            self.r = requests.post(
+                self.mesos_url + '/api/v1/scheduler',
+                json.dumps(offers_decline),
+                headers=headers
+            )
+        except Exception as e:
+            raise MesosException(e)
+        return True
